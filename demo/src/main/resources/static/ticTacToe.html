@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Caro Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="left">
+    <button id="loginButton" onclick="showLoginRegister()">Login</button>
+    <div id="playerInfo" class="info">
+        <h2>Player Info</h2>
+        <div id="playerName">Not logged in</div>
+        <div id="playerStats">Matches: 0, Wins: 0</div>
+    </div>
+    <div>
+        <button onclick="playWithAI()">Play with AI</button>
+        <button onclick="findMatch()">Play with People</button>
+    </div>
+    <div id="chatBox"></div>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+</div>
+<div class="right">
+    <div id="boardContainer"></div>
+</div>
+
+<div id="loginRegisterContainer">
+    <h2>Login / Register</h2>
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="email" id="email" placeholder="Email (for register only)" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button onclick="performLogin()">Login</button>
+    <button onclick="performRegister()">Register</button>
+    <button onclick="closeLoginRegister()">Close</button>
+</div>
+<div class="overlay" id="overlay" onclick="closeLoginRegister()"></div>
+<div id="notification" class="notification"></div>
+
+<script src="user.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
