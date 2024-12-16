@@ -25,7 +25,6 @@ public class Board {
     public boolean checkWin(int x, int y, String player) {
         int count;
 
-        // Kiểm tra hàng ngang
         count = 1;
         for (int i = 1; i < 5; i++) {
             if (x + i < size && board[x + i][y].equals(player)) count++;
@@ -37,7 +36,6 @@ public class Board {
         }
         if (count >= 5) return true;
 
-        // Kiểm tra hàng dọc
         count = 1;
         for (int i = 1; i < 5; i++) {
             if (y + i < size && board[x][y + i].equals(player)) count++;
@@ -49,7 +47,6 @@ public class Board {
         }
         if (count >= 5) return true;
 
-        // Kiểm tra đường chéo chính
         count = 1;
         for (int i = 1; i < 5; i++) {
             if (x + i < size && y + i < size && board[x + i][y + i].equals(player)) count++;
@@ -61,7 +58,6 @@ public class Board {
         }
         if (count >= 5) return true;
 
-        // Kiểm tra đường chéo phụ
         count = 1;
         for (int i = 1; i < 5; i++) {
             if (x + i < size && y - i >= 0 && board[x + i][y - i].equals(player)) count++;

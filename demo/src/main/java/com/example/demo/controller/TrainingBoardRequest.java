@@ -9,7 +9,6 @@ public class TrainingBoardRequest {
     @NotNull
     private int targetSteps;
 
-    // Getters and setters
     public String getBoardState() {
         return boardState;
     }

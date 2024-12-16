@@ -8,17 +8,13 @@
 <body>
 <div id="headerContainer"></div>
 <div class="container">
-    <div class="left">
+    <div class="sidebar">
         <button onclick="fetchRandomTrainingBoard()">Load Training Board</button>
-        <button onclick="initCreateBoardMode()">Create New Board</button>
-        <button id="saveBoardButton" style="display: none;" onclick="saveBoardToDatabase()">Save Board to Database</button>
     </div>
-    <div class="center">
+    <div class="main">
         <div id="boardContainer"></div>
     </div>
-    <div class="right">
-        <div id="notificationContainer"></div>
-    </div>
+    <div id="notificationContainer"></div>
 </div>
 <script src="js/header.js"></script>
 <script src="js/train.js"></script>

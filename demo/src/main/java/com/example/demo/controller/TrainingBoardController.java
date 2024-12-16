@@ -16,6 +16,18 @@ public class TrainingBoardController {
     @Autowired
     private TrainingBoardService trainingBoardService;
 
+    @GetMapping("/random")
+    public ResponseEntity<TrainingBoard> getRandomBoard() {
+        TrainingBoard randomBoard = trainingBoardService.getRandomBoard();
+        return ResponseEntity.ok(randomBoard);
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<Boolean> checkWin(@RequestBody String[][] board, @RequestParam int x, @RequestParam int y) {
+        boolean isWin = trainingBoardService.checkWin(board, x, y, "X");
+        return ResponseEntity.ok(isWin);
+    }
+
     @GetMapping
     public List<TrainingBoard> getAllBoards() {
         return trainingBoardService.getAllBoards();
@@ -25,12 +37,6 @@ public class TrainingBoardController {
     public ResponseEntity<TrainingBoard> getBoardById(@PathVariable Long id) {
         Optional<TrainingBoard> board = trainingBoardService.getBoardById(id);
         return board.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/random")
-    public ResponseEntity<TrainingBoard> getRandomBoard() {
-        TrainingBoard randomBoard = trainingBoardService.getRandomBoard();
-        return ResponseEntity.ok(randomBoard);
     }
 
     @PostMapping
