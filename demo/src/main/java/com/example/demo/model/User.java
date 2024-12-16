@@ -1,37 +1,30 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "username", nullable = false)
     private String username;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Transient
-    private String message;
+    @Column(name = "matches_played", nullable = false)
+    private int matchesPlayed = 0;
 
+    @Column(name = "matches_won", nullable = false)
+    private int matchesWon = 0;
 
-    public User(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -64,16 +57,19 @@ public class User {
         this.password = password;
     }
 
-    public User(){
-
+    public int getMatchesPlayed() {
+        return matchesPlayed;
     }
 
-    public User(Long id, String username, String email, String password, String message) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.message = message;
+    public void setMatchesPlayed(int matchesPlayed) {
+        this.matchesPlayed = matchesPlayed;
+    }
+
+    public int getMatchesWon() {
+        return matchesWon;
+    }
+
+    public void setMatchesWon(int matchesWon) {
+        this.matchesWon = matchesWon;
     }
 }
-

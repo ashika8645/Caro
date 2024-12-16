@@ -106,10 +106,27 @@ function logout() {
     showNotification('Logged out');
 }
 
-// Check if user is already logged in
 if (localStorage.getItem('token')) {
     playerName.textContent = localStorage.getItem('username');
     playerStats.textContent = `Matches: ${localStorage.getItem('matches') || 0}, Wins: ${localStorage.getItem('wins') || 0}`;
     loginButton.textContent = "Logout";
     loginButton.onclick = logout;
+}
+
+const ws = new WebSocket('ws://localhost:8080/ws/game');
+const chatSocket = new WebSocket('ws://localhost:8080/chat');
+
+ws.onopen = () => {
+    console.log('Connected to server');
+};
+
+chatSocket.onopen = () => {
+    console.log('Connected to chat server');
+};
+
+function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value;
+    chatSocket.send(JSON.stringify({ type: 'chat', matchId, message }));
+    messageInput.value = '';
 }

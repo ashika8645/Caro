@@ -1,0 +1,25 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login/Register</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="headerContainer"></div>
+<div class="left">
+    <div id="loginRegisterContainer">
+        <h2>Login / Register</h2>
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="email" id="email" placeholder="Email (for register only)" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button onclick="performLogin()">Login</button>
+        <button onclick="performRegister()">Register</button>
+    </div>
+    <div id="notification" class="notification"></div>
+</div>
+<script src="js/header.js"></script>
+<script src="js/user.js"></script>
+</body>
+</html>

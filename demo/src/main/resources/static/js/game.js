@@ -6,7 +6,7 @@ const messageInput = document.getElementById('messageInput');
 let gameStarted = false;
 let currentPlayer = 'X';
 let matchId;
-let myTurn = false; // Biến để kiểm tra lượt chơi
+let myTurn = false;
 
 const ws = new WebSocket('ws://localhost:8080/ws/game');
 
@@ -27,30 +27,26 @@ ws.onmessage = (event) => {
             currentPlayer = data.role;
             resetBoard();
             gameStarted = true;
-            myTurn = (currentPlayer === 'X'); // X đi trước
+            myTurn = (currentPlayer === 'X');
             showNotification(`Match found! You are playing as ${data.role}`);
             break;
 
         case 'move':
             updateBoard(data.x, data.y, data.player);
-            myTurn = !myTurn; // Đổi lượt sau khi nhận được nước đi từ đối thủ
+            myTurn = !myTurn;
             break;
 
         case 'gameOver':
-            // Cập nhật nước đi cuối cùng
             updateBoard(data.x, data.y, data.player);
 
-            // Highlight các ô thắng cho cả 2 bên
             if (data.winningCells && data.winningCells.length > 0) {
                 highlightWinningCells(data.winningCells);
             }
 
-            // Hiển thị thông báo kết quả
             showNotification(
                 `Game over! ${data.winner === 'Draw' ? "It's a draw!" : `${data.winner} wins!`}`
             );
 
-            // Kết thúc game
             gameStarted = false;
             myTurn = false;
             break;
@@ -122,7 +118,6 @@ function makeMove(x, y, cell) {
 
     cell.textContent = currentPlayer;
 
-    // Gửi nước đi tới server để xử lý logic game
     sendMove(x, y);
 }
 
@@ -143,10 +138,8 @@ function resetBoard() {
     createBoard();
 }
 
-// Initialize game
 createBoard();
 
-// Chat WebSocket
 const chatSocket = new WebSocket('ws://localhost:8080/chat');
 
 chatSocket.onopen = () => {

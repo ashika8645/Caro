@@ -31,7 +31,6 @@ public class AuthController {
         if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
             // Generate token manually for simplicity
             String token = user.getUsername() + "-token"; // Simple token (for demonstration purposes)
-            user.setMessage(token); // Set the token in the user object
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(401).body("Invalid credentials");
