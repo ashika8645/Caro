@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.*;

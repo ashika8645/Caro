@@ -24,7 +24,6 @@ public class User {
     @Column(name = "matches_won", nullable = false)
     private int matchesWon = 0;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

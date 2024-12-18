@@ -19,7 +19,6 @@ public class TrainingBoard {
     @Column(name = "target_steps", nullable = false)
     private int targetSteps;
 
-    // Getters and Setters
 
     public Long getId() {
         return id;

@@ -35,13 +35,11 @@ public class Game {
     }
 
     private boolean checkWin(int x, int y) {
-        // Logic kiểm tra thắng
-        return false; // Giả lập, cần thêm logic thực tế
+        return false;
     }
 
     private boolean checkDraw() {
-        // Logic kiểm tra hòa
-        return false; // Giả lập, cần thêm logic thực tế
+        return false;
     }
 
     public char[][] getBoard() {

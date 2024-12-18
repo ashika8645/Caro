@@ -17,10 +17,10 @@ public class Match {
     private String winner;
 
     @Transient
-    private transient Board board; // Sử dụng transient
+    private transient Board board;
 
     public Match() {
-        this.board = new Board(15); // Khởi tạo bàn cờ 15x15
+        this.board = new Board(15);
         this.currentPlayer = "X";
     }
 

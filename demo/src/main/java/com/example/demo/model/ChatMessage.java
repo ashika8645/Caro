@@ -1,25 +1,29 @@
 package com.example.demo.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 
 @Entity
-@Data
-@Builder
 public class ChatMessage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long matchId;
-    private Long playerId;
+
+    private String matchId;
+    private String sender;
     private String message;
+
+    public ChatMessage() {
+    }
+
+    public ChatMessage(String matchId, String sender, String message) {
+        this.matchId = matchId;
+        this.sender = sender;
+        this.message = message;
+    }
 
     public Long getId() {
         return id;
@@ -29,20 +33,20 @@ public class ChatMessage {
         this.id = id;
     }
 
-    public Long getMatchId() {
+    public String getMatchId() {
         return matchId;
     }
 
-    public void setMatchId(Long matchId) {
+    public void setMatchId(String matchId) {
         this.matchId = matchId;
     }
 
-    public Long getPlayerId() {
-        return playerId;
+    public String getSender() {
+        return sender;
     }
 
-    public void setPlayerId(Long playerId) {
-        this.playerId = playerId;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public String getMessage() {
@@ -50,16 +54,6 @@ public class ChatMessage {
     }
 
     public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public  ChatMessage(){
-
-    }
-    public ChatMessage(Long id, Long matchId, Long playerId, String message) {
-        this.id = id;
-        this.matchId = matchId;
-        this.playerId = playerId;
         this.message = message;
     }
 }

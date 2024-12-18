@@ -27,6 +27,7 @@ body {
     margin-bottom: 10px;
     font-size: 16px;
     cursor: pointer;
+    border-radius: 10px
 }
 
 .sidebar button:hover {
@@ -72,7 +73,7 @@ table {
 
 td, th {
     border: 1px solid #ddd;
-    padding: 0; /* Remove padding to ensure square cells */
+    padding: 0;
     width: 40px;
     height: 40px;
     text-align: center;

@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import com.example.demo.handler.ChatHandler;
+import com.example.demo.handler.GameHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -13,10 +15,16 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(gameHandler(), "/ws/game").setAllowedOrigins("*");
+        registry.addHandler(chatHandler(), "/ws/chat").setAllowedOrigins("*");
     }
 
     @Bean
     public GameHandler gameHandler() {
         return new GameHandler();
+    }
+
+    @Bean
+    public ChatHandler chatHandler() {
+        return new ChatHandler();
     }
 }

@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,9 +30,47 @@ public class UserController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.createUser(user));
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (userService.existsByUsername(user.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("message", "Username is already taken!"));
+        }
+
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("message", "Email is already in use!"));
+        }
+
+        User newUser = userService.createUser(user);
+        return ResponseEntity.ok(Collections.singletonMap("id", newUser.getId()));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        Optional<User> optionalUser = Optional.ofNullable(userService.getUserByUsername(user.getUsername()));
+
+        if (!optionalUser.isPresent() || !optionalUser.get().getPassword().equals(user.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "Invalid credentials"));
+        }
+
+        User loggedInUser = optionalUser.get();
+        return ResponseEntity.ok(Collections.singletonMap("user", loggedInUser));
+    }
+
+    @PutMapping("/updateStats/{id}")
+    public ResponseEntity<User> updateStats(@PathVariable Long id, @RequestBody User updatedUser) {
+        return userService.getUserById(id)
+                .map(existingUser -> {
+                    existingUser.setMatchesPlayed(updatedUser.getMatchesPlayed());
+                    existingUser.setMatchesWon(updatedUser.getMatchesWon());
+                    return ResponseEntity.ok(userService.createUser(existingUser));
+                })
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")

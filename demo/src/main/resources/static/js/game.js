@@ -2,86 +2,134 @@ const boardSize = 15;
 const boardContainer = document.getElementById('boardContainer');
 const chatBox = document.getElementById('chatBox');
 const messageInput = document.getElementById('messageInput');
+const notification = document.getElementById('notification');
 
 let gameStarted = false;
 let currentPlayer = 'X';
 let matchId;
 let myTurn = false;
+let ws;
+let chatSocket;
 
-const ws = new WebSocket('ws://localhost:8080/ws/game');
+document.addEventListener('DOMContentLoaded', () => {
+    const playerName = localStorage.getItem('username');
+    const matches = localStorage.getItem('matches');
+    const wins = localStorage.getItem('wins');
 
-ws.onopen = () => {
-    console.log('Connected to server');
-};
+    document.getElementById('playerName').textContent = playerName || 'Not logged in';
+    document.getElementById('playerStats').textContent = playerName ? `Matches: ${matches}, Wins: ${wins}` : '';
 
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
+    createBoard();
+    connectToGameServer();
+});
 
-    switch (data.type) {
-        case 'waiting':
-            showNotification(data.message, 'info');
-            break;
+function connectToGameServer() {
+    ws = new WebSocket('ws://localhost:8080/ws/game');
+    ws.onopen = () => {
+        console.log('Connected to game server');
+    };
 
-        case 'matchFound':
-            matchId = data.matchId;
-            currentPlayer = data.role;
-            resetBoard();
-            gameStarted = true;
-            myTurn = (currentPlayer === 'X');
-            showNotification(`Match found! You are playing as ${data.role}`);
-            break;
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-        case 'move':
-            updateBoard(data.x, data.y, data.player);
-            myTurn = !myTurn;
-            break;
+        switch (data.type) {
+            case 'waiting':
+                showNotification(data.message, 'info');
+                break;
 
-        case 'gameOver':
-            updateBoard(data.x, data.y, data.player);
+            case 'matchFound':
+                matchId = data.matchId;
+                currentPlayer = data.role;
+                resetBoard();
+                gameStarted = true;
+                myTurn = (currentPlayer === 'X');
+                showNotification(`Match found! You are playing as ${data.role}`);
+                break;
 
-            if (data.winningCells && data.winningCells.length > 0) {
-                highlightWinningCells(data.winningCells);
-            }
+            case 'move':
+                updateBoard(data.x, data.y, data.player);
+                myTurn = !myTurn;
+                break;
 
-            showNotification(
-                `Game over! ${data.winner === 'Draw' ? "It's a draw!" : `${data.winner} wins!`}`
-            );
+            case 'gameOver':
+                updateBoard(data.x, data.y, data.player);
 
-            gameStarted = false;
-            myTurn = false;
-            break;
+                if (data.winningCells && data.winningCells.length > 0) {
+                    highlightWinningCells(data.winningCells);
+                }
 
-        case 'chat':
-            addChatMessage(data.message);
-            break;
+                showNotification(
+                    `Game over! ${data.winner === 'Draw' ? "It's a draw!" : `${data.winner} wins!`}`
+                );
 
-        case 'opponentDisconnected':
-            showNotification('Your opponent has disconnected. You win by default.', 'info');
-            gameStarted = false;
-            break;
+                gameStarted = false;
+                myTurn = false;
 
-        case 'error':
-            showNotification(data.message, 'error');
-            break;
+                updateStats(data.winner);
+                break;
 
-        case 'notification':
-            showNotification(data.message, 'info');
-            break;
-    }
-};
+            case 'chat':
+                addChatMessage(data.message, 'opponent');
+                break;
+
+            case 'opponentDisconnected':
+                showNotification('Your opponent has disconnected. You win by default.', 'info');
+                gameStarted = false;
+
+                updateStats(currentPlayer);
+                break;
+
+            case 'error':
+                showNotification(data.message, 'error');
+                break;
+
+            case 'notification':
+                showNotification(data.message, 'info');
+                break;
+        }
+    };
+
+    chatSocket = new WebSocket('ws://localhost:8080/ws/chat');
+
+    chatSocket.onopen = () => {
+        console.log('Connected to chat server');
+    };
+
+    chatSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'chat') {
+            addChatMessage(data.message, 'opponent');
+        }
+    };
+}
 
 function findMatch() {
-    ws.send(JSON.stringify({ type: 'findMatch' }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'findMatch' }));
+    } else {
+        showNotification('Not connected to the game server', 'error');
+    }
 }
 
 function sendMove(x, y) {
-    ws.send(JSON.stringify({ type: 'move', matchId, player: currentPlayer, x, y }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'move', matchId, player: currentPlayer, x, y }));
+    } else {
+        showNotification('Not connected to the game server', 'error');
+    }
 }
 
 function sendChatMessage() {
+    if (!gameStarted) {
+        showNotification('You can only chat during an active game.', 'error');
+        return;
+    }
     const message = messageInput.value;
-    ws.send(JSON.stringify({ type: 'chat', matchId, message }));
-    messageInput.value = '';
+    if (message.trim() !== '') {
+        chatSocket.send(JSON.stringify({ type: 'chat', matchId, message }));
+        addChatMessage(message, 'self');
+        messageInput.value = '';
+    }
 }
 
 function createBoard() {
@@ -138,35 +186,62 @@ function resetBoard() {
     createBoard();
 }
 
-createBoard();
-
-const chatSocket = new WebSocket('ws://localhost:8080/chat');
-
-chatSocket.onopen = () => {
-    console.log('Connected to chat server');
-};
-
-chatSocket.onmessage = (event) => {
-    const message = event.data;
-    const messagesDiv = document.getElementById('messages');
+function addChatMessage(message, sender) {
     const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message');
+    if (sender === 'self') {
+        messageElement.classList.add('self');
+    } else {
+        messageElement.classList.add('opponent');
+    }
     messageElement.textContent = message;
-    messagesDiv.appendChild(messageElement);
-};
-
-function sendChatMessage() {
-    const messageInput = document.getElementById('messageInput');
-    const message = messageInput.value;
-    chatSocket.send(message);
-    messageInput.value = '';
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
     notification.textContent = message;
     notification.className = `notification ${type}`;
     notification.style.display = 'block';
     setTimeout(() => {
         notification.style.display = 'none';
     }, 3000);
+}
+
+function updateStats(winner) {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const currentMatches = parseInt(localStorage.getItem('matches'), 10) || 0;
+    const currentWins = parseInt(localStorage.getItem('wins'), 10) || 0;
+
+    const newMatches = currentMatches + 1;
+    const newWins = winner === currentPlayer ? currentWins + 1 : currentWins;
+
+    localStorage.setItem('matches', newMatches);
+    localStorage.setItem('wins', newWins);
+
+    fetch(`/api/users/updateStats/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            matchesPlayed: newMatches,
+            matchesWon: newWins
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => { throw new Error(error.message); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('playerStats').textContent = `Matches: ${newMatches}, Wins: ${newWins}`;
+    })
+    .catch(error => {
+        showNotification(`Error updating stats: ${error.message}`, 'error');
+        console.error('Error updating stats:', error);
+    });
 }

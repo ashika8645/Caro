@@ -1,19 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.ChatMessage;
-import com.example.demo.service.ChatService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Controller;
 
-@RestController
-@RequestMapping("/api")
+@Controller
 public class ChatController {
 
-    @Autowired
-    private ChatService chatService;
-
-    @PostMapping("/chat")
-    public ChatMessage sendMessage(@RequestBody ChatMessage message) {
-        return chatService.saveMessage(message);
+    @MessageMapping("/sendMessage")
+    @SendTo("/topic/messages")
+    public ChatMessage sendMessage(ChatMessage chatMessage) {
+        return chatMessage;
     }
 }
